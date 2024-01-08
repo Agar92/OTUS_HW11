@@ -2,9 +2,9 @@
 
 #include <filesystem>
 
-std::vector<file_block_reader> file_splitter::split(const std::string& path)
+std::vector<FileBlockReader> FileSplitter::split(const std::string& path)
 {    
-    std::vector<file_block_reader> readers;
+    std::vector<FileBlockReader> readers;
     readers.reserve(m_blocks_count);
 
     std::filesystem::directory_entry file_info(path);

@@ -6,12 +6,12 @@
 #include <string>
 #include <vector>
 
-class file_splitter
+class FileSplitter
 {
 public:
-    file_splitter(size_t blocks) : m_blocks_count(blocks) {}
+    FileSplitter(size_t blocks) : m_blocks_count(blocks) {}
 
-    std::vector<file_block_reader> split(const std::string& path);
+    std::vector<FileBlockReader> split(const std::string& path);
 private:
     size_t m_blocks_count;
 };

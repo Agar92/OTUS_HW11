@@ -12,7 +12,7 @@
 #include <future>
 #include <string>
 
-void run_mapper(block_reader * reader,
+void run_mapper(BlockReader * reader,
                 const std::function<std::pair<std::string, int>(const std::string&)>& map_func,
                 std::vector<std::pair<std::string, int>>& container)
 {
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
         rnum = atoi(argv[3]);
     }
 
-    auto readers = file_splitter(mnum).split(src);
+    auto readers = FileSplitter(mnum).split(src);
     vector<vector<pair<string, int>>> after_map(mnum);
     vector<vector<pair<string, int>>> for_reduce(rnum);
     
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
 
     if (!full_duplicates)
     {
-        cout << "[DONE] Minimum unique prefix length: " + to_string(prefix_len) << endl;
+        cout << "Minimum unique prefix length: " + to_string(prefix_len) << endl;
     }
 
     return 0;

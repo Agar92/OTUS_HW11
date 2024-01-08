@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-bool file_block_reader::get_next_line(std::string& line)
+bool FileBlockReader::get_next_line(std::string& line)
 {
     if (!m_filestream.is_open() || m_is_eof || (m_bytes_read >= m_length))
         return false;
@@ -13,7 +13,7 @@ bool file_block_reader::get_next_line(std::string& line)
     return !m_is_eof && (m_bytes_read <= m_length);
 }
 
-void file_block_reader::reset()
+void FileBlockReader::reset()
 {
     if (!m_filestream.is_open() || m_is_eof)
     {

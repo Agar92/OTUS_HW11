@@ -3,25 +3,25 @@
 #include <fstream>
 #include <string>
 
-class block_reader
+class BlockReader
 {
 public:
     virtual bool get_next_line(std::string& line) = 0;
     virtual void reset(){}
-    virtual ~block_reader() = default;
+    virtual ~BlockReader() = default;
 };
 
-class file_block_reader : public block_reader
+class FileBlockReader : public BlockReader
 {
 public:
-    file_block_reader(const std::string& path, uintmax_t start, uintmax_t length) :
+    FileBlockReader(const std::string& path, uintmax_t start, uintmax_t length) :
         m_path(path), m_start(start), m_length(length)
     {
         m_filestream.open(m_path);
         m_filestream.seekg(m_start, m_filestream.beg);
     }
 
-    file_block_reader(const file_block_reader& other) :
+    FileBlockReader(const FileBlockReader& other) :
         m_path(other.m_path), m_start(other.m_start), m_length(other.m_length)
     {
         m_filestream.open(m_path);
@@ -32,7 +32,7 @@ public:
 
     void reset() override;
 
-    virtual ~file_block_reader() = default;
+    virtual ~FileBlockReader() = default;
 
 private:
     std::string m_path;

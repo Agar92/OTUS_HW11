@@ -13,13 +13,13 @@ class mapper
 {
 public:
     mapper(const std::function<std::pair<K, V>(const std::string&)>& map_func,
-           block_reader * reader) : m_map(map_func), m_block_reader(reader) {}
+           BlockReader * reader) : m_map(map_func), m_block_reader(reader) {}
 
     void run(std::vector<std::pair<K, V>>& container);
 
 private:
     std::function<std::pair<K, V>(const std::string&)> m_map;
-    block_reader * m_block_reader;
+    BlockReader * m_block_reader;
 };
 
 template<typename K, typename V>

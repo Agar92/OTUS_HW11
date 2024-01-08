@@ -107,10 +107,10 @@ TEST(Framework, Reduce)
     ASSERT_EQ(max, 15);
 }
 
-class block_reader_mock : public block_reader
+class BlockReaderMock : public BlockReader
 {
 public:
-    block_reader_mock(std::vector<std::string>::iterator from, std::vector<std::string>::iterator to)
+    BlockReaderMock(std::vector<std::string>::iterator from, std::vector<std::string>::iterator to)
     {
         m_lines.insert(m_lines.end(), from, to);
         m_pos = m_lines.begin();
@@ -162,7 +162,7 @@ TEST(Framework, Usage)
         int block_size = lines.size() / mappers_count;
         for(auto m = 0; m < mappers_count; m++)
         {
-            auto reader = block_reader_mock(lines.begin() + m * block_size, lines.begin() + (m +1) * block_size);
+            auto reader = BlockReaderMock(lines.begin() + m * block_size, lines.begin() + (m +1) * block_size);
             mapper<std::string, int> map_runner(map_func, &reader);
             map_runner.run(after_map[m]);
         }
