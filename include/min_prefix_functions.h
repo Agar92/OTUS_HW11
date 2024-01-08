@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../include/max_summator.h"
+#include <max_summator.h>
 
 #include <functional>
 #include <string>

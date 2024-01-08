@@ -1,10 +1,10 @@
-#include "../include/block_reader.h"
-#include "../include/file_splitter.h"
-#include "../include/max_summator.h"
-#include "../include/mapper.h"
-#include "../include/min_prefix_functions.h"
-#include "../include/shuffler.h"
-#include "../include/reducer.h"
+#include <block_reader.h>
+#include <file_splitter.h>
+#include <max_summator.h>
+#include <mapper.h>
+#include <min_prefix_functions.h>
+#include <shuffler.h>
+#include <reducer.h>
 
 #include <gtest/gtest.h>
 #include <iostream>

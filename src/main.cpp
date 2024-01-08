@@ -1,8 +1,8 @@
-#include "../include/file_splitter.h"
-#include "../include/mapper.h"
-#include "../include/min_prefix_functions.h"
-#include "../include/reducer.h"
-#include "../include/shuffler.h"
+#include <file_splitter.h>
+#include <mapper.h>
+#include <min_prefix_functions.h>
+#include <reducer.h>
+#include <shuffler.h>
 
 #include <atomic>
 #include <cstdlib>

@@ -1,4 +1,4 @@
-#include "../include/min_prefix_functions.h"
+#include <min_prefix_functions.h>
 
 std::pair<std::string, int> get_prefix_pair(int prefix_len, const std::string& str)
 {

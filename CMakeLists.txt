@@ -38,8 +38,8 @@ set_target_properties(unit_tests PROPERTIES
 
 target_link_libraries(mapreduce pthread)
 target_link_libraries(unit_tests pthread GTest::gtest_main)
-target_include_directories(mapreduce PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
-target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+target_include_directories(mapreduce PRIVATE ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
+target_include_directories(unit_tests PRIVATE ${CMAKE_SOURCE_DIR}/include ${CMAKE_BINARY_DIR})
 
 if (MSVC)
     target_compile_options(mapreduce PRIVATE

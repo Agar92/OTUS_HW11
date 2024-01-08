@@ -1,4 +1,4 @@
-#include "../include/file_splitter.h"
+#include <file_splitter.h>
 
 #include <filesystem>
 

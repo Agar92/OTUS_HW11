@@ -1,7 +1,6 @@
-#ifndef MAPPER_H
-#define MAPPER_H
+#pragma once
 
-#include "block_reader.h"
+#include <block_reader.h>
 
 #include <algorithm>
 #include <fstream>
@@ -31,5 +30,3 @@ void mapper<K, V>::run(std::vector<std::pair<K, V>>& container)
         container.push_back(m_map(line));
     std::sort(container.begin(), container.end());
 }
-
-#endif
