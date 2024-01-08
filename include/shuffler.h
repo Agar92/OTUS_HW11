@@ -1,7 +1,5 @@
 #pragma once
 
-#include <container_trace.h>
-
 #include <iterator>
 #include <list>
 #include <numeric>
@@ -13,6 +11,21 @@ class shuffler
 public:
     void run(std::vector<std::vector<std::pair<K, V>>>& after_map,
              std::vector<std::vector<std::pair<K, V>>>& for_reduce);
+private:
+    template<typename Container> 
+    struct container_trace
+    {
+        container_trace(Container & container) : 
+            m_container(container),
+            m_pos(container.begin()),
+            m_end(container.end()) {}
+
+        bool is_finished() const {return m_pos == m_end;}
+
+        Container & m_container;
+        typename Container::iterator m_pos;
+        typename Container::iterator m_end;
+    };
 };
 
 template<typename K, typename V>
