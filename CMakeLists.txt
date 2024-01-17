@@ -27,7 +27,7 @@ target_link_libraries(mapreduce
         ${CMAKE_THREAD_LIBS_INIT})
 
 configure_file(test/project_path.h.in project_path.h)
-find_package(GTest REQUIRED)
+###find_package(GTest REQUIRED)
 add_executable(test_mapreduce test/test_mapreduce.cpp)
 target_link_libraries(test_mapreduce
         ${CMAKE_THREAD_LIBS_INIT}
