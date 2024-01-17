@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
         tasks_to_wait.clear();
         for(auto m = 0; m < mnum; m++)
         {
-            tasks_to_wait.push_back(async([m, &readers, &map_func, &after_map]()
+            tasks_to_wait.push_back(async(std::launch::async,[m, &readers, &map_func, &after_map]()
             {
                 run_mapper(&readers[m], map_func,
                             std::reference_wrapper<vector<pair<string, int>>>(after_map[m]));
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
         tasks_to_wait.clear();
         for(auto r = 0; r < rnum; r++)
         {
-            tasks_to_wait.push_back(std::async([r, &for_reduce, &out_filenames]()
+            tasks_to_wait.push_back(std::async(std::launch::async,[r, &for_reduce, &out_filenames]()
             {
                 run_reducer(reference_wrapper<vector<pair<string, int>>>(for_reduce[r]),
                             out_filenames[r]);
