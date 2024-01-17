@@ -30,8 +30,8 @@ configure_file(test/project_path.h.in project_path.h)
 find_package(GTest REQUIRED)
 add_executable(test_mapreduce test/test_mapreduce.cpp)
 target_link_libraries(test_mapreduce
-        ${GTEST_LIBRARIES}
-        ${CMAKE_THREAD_LIBS_INIT})
+        ${CMAKE_THREAD_LIBS_INIT}
+        GTest::gtest_main)
 
 
 install(TARGETS mapreduce RUNTIME DESTINATION bin)
