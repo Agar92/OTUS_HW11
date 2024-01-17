@@ -1,151 +1,71 @@
-#include <file_splitter.h>
-#include <mapper.h>
-#include <min_prefix_functions.h>
-#include <reducer.h>
-#include <shuffler.h>
-
-#include <atomic>
-#include <cstdlib>
-#include <condition_variable>
 #include <iostream>
+#include <sstream>
 #include <fstream>
-#include <future>
 #include <string>
+#include <algorithm>
+#include <map_reduce_runner.h>
+#include <prefix_functors.h>
 
-void run_mapper(BlockReader * reader,
-                const std::function<std::pair<std::string, int>(const std::string&)>& map_func,
-                std::vector<std::pair<std::string, int>>& container)
-{
-    mapper<std::string, int> map_runner(map_func, reader);
-    map_runner.run(container);
+bool file_exists(const std::string& filename) {
+    std::ifstream infile(filename);
+    return infile.good();
 }
 
-void run_reducer(const std::vector<std::pair<std::string, int>>& container,
-                 const std::string& out_filename)
-{
-    reducer<max_summator<std::string, int>, std::string, int> reduce_runner(accumulate_key_sum);
-    auto result = reduce_runner.run(container);
-    std::ofstream outfile(out_filename, std::ios::trunc);
-    for (const auto& line: result.get_max_value_str())
-        outfile << line << std::endl;
-}
+int main(int argc, char *argv[]) {
+    bool executed_correctly = true;
+    std::stringstream whats_wrong;
+    std::string src_file;
+    int num_threads_map = 1;
+    int num_threads_reduce = 1;
 
-int main(int argc, char* argv[])
-{
-    using namespace std;
-    string src;
-    int mnum, rnum; 
-    if (argc == 1)
-    {
-        src = "../tests/ips.txt";
-        mnum = 10;
-        rnum = 5;
-    }
-    else if (argc != 4)
-    {
-        cout << "Usage:  mapreduce <src> <mnum> <rnum>" << endl;
-        return 0;
-    }
-    else
-    {
-        src = argv[1];
-        mnum = atoi(argv[2]);
-        rnum = atoi(argv[3]);
-    }
 
-    auto readers = FileSplitter(mnum).split(src);
-    vector<vector<pair<string, int>>> after_map(mnum);
-    vector<vector<pair<string, int>>> for_reduce(rnum);
-    
-    vector<string> out_filenames(rnum);
-    for(auto r = 0; r < rnum; r++)
-        out_filenames[r] = "./reducer_" + to_string(r + 1) + ".txt";
-
-    unsigned int prefix_len = 1;
-    const int prefix_limit = 200;
-    bool full_duplicates = false;
-    std::vector<std::future<void>> tasks_to_wait;
-    while(prefix_len < prefix_limit)
-    { 
-        cout << "Testing prefix length: " + to_string(prefix_len);
-        auto map_func = get_prefix_pair_function(prefix_len);
-        tasks_to_wait.clear();
-        for(auto m = 0; m < mnum; m++)
-        {
-            tasks_to_wait.push_back(async(std::launch::async,[m, &readers, &map_func, &after_map]()
-            {
-                run_mapper(&readers[m], map_func,
-                            std::reference_wrapper<vector<pair<string, int>>>(after_map[m]));
-            }));
-        }
-        
-        for(auto m = 0; m < mnum; m++)
-            tasks_to_wait[m].wait();
-
-        shuffler<string, int> shaffle;
-        shaffle.run(after_map, for_reduce);
-        
-        tasks_to_wait.clear();
-        for(auto r = 0; r < rnum; r++)
-        {
-            tasks_to_wait.push_back(std::async(std::launch::async,[r, &for_reduce, &out_filenames]()
-            {
-                run_reducer(reference_wrapper<vector<pair<string, int>>>(for_reduce[r]),
-                            out_filenames[r]);
-            }));
-        }
-
-        for(auto r = 0; r < rnum; r++)
-            tasks_to_wait[r].wait();
-
-        auto max_duplicates = -1;
-        std::string duplicates_key;
-        int duplicates;
-        for(auto r = 0; r < rnum; r++)
-        {
-            ifstream r_file(out_filenames[r]);
-            r_file >> duplicates;  
-
-            if (duplicates >= 2)
-            {
-                r_file >> duplicates_key;
-                if (duplicates_key.size() < prefix_len)
-                {
-                    cout << ". Full duplicates found. No solution." << std::endl;
-                    cout << "Full duplicates key: " 
-                        + duplicates_key + ". Duplicates count: " + to_string(duplicates) << std::endl;
-                    full_duplicates = true;
-                    break;
-                }
+    if (argc != 4) {
+        executed_correctly = false;
+        whats_wrong << "Incorrect number of arguments";
+    } else {
+        try {
+            src_file = argv[1];
+            num_threads_map = std::stoi(argv[2]);
+            num_threads_reduce = std::stoi(argv[3]);
+            if (num_threads_map <= 0 or num_threads_reduce <= 0) {
+                whats_wrong << "Number of threads must be positive";
+                executed_correctly = false;
+            } else if (!file_exists(src_file)) {
+                whats_wrong << "File " << src_file << " doesn't exist!";
+                executed_correctly = false;
             }
-
-            if (duplicates > max_duplicates)
-                max_duplicates = duplicates;
-        }
-
-        if (full_duplicates)
-            break;
-
-        cout << ". Maximum duplicates: " + to_string(max_duplicates) << endl;
-        if (max_duplicates < 2) break;
-        else
-        {
-            prefix_len++;
-            for(auto m = 0; m < mnum; m++)
-            {
-                after_map[m].clear();
-                readers[m].reset();
-            }
-            for(auto r = 0; r < rnum; r++)
-            {
-                for_reduce[r].clear();
-            }
+        } catch (std::exception& ex) {
+            executed_correctly = false;
+            whats_wrong << ex.what();
         }
     }
 
-    if (!full_duplicates)
-    {
-        cout << "Minimum unique prefix length: " + to_string(prefix_len) << endl;
+    if (!executed_correctly) {
+        std::cout << "Error: " << whats_wrong.str() << std::endl;
+        std::cout << "Execute with 3 arguments - source file, num threads for map, num threads for reduce, e.g.:"
+                  << std::endl;
+        std::cout << argv[0] << " infile.txt 4 4" << std::endl;
+        exit(0);
+    }
+
+    // original algorithm with prefixes generation, works correctly when there are NO duplicated emails
+//    using namespace prefix_no_duplicates;
+
+// original algorithm with prefixes generation, works correctly when there are duplicated emails
+//    using namespace prefix;
+
+    // optimized algorithm with first letter as key: no memory overhead, very fast, handles correctly duplicated emails
+    using namespace prefix_optimized;
+
+    auto task_runner = mapreduce::MapReduceRunner<PrefixMapper, PrefixReducer>(
+            src_file, num_threads_map, num_threads_reduce
+    );
+    std::vector<int> reduce_results = task_runner.process();
+    auto result = std::max_element(reduce_results.cbegin(), reduce_results.cend());
+    if (result != reduce_results.cend()) {
+        std::cout << *result << std::endl;
+    } else {
+        std::cout << "empty result" << std::endl;
     }
 
     return 0;

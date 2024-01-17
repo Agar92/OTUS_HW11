@@ -5,7 +5,7 @@ on:
     branches:
       - main
       - master
-#  workflow_dispatch:
+      - excellent_approach_that_treats_duplicates
 
 jobs:
   build:
